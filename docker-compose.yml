@@ -1,0 +1,46 @@
+version: "3.8"
+services:
+  nginx:
+    container_name: nginx
+    build: ./nginx/
+    command: nginx -g "daemon off;"
+    links:
+      - php
+    ports:
+      - 7090:80
+    volumes:
+      - ./src:/var/www/html
+  php:
+    container_name: php
+    build: ./php/
+    links:
+      - mysql
+    ports:
+      - 9000:9000
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    ports:
+      - 3306:3306
+    volumes:
+      - ./database/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysql007
+      - MYSQL_DATABASE=EmployeeDb
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=abc123#
+  phpadmin:
+    container_name: pma
+    image: phpmyadmin/phpmyadmin
+    links:
+      - mysql
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - PMA_ARBITRARY=1
+    restart: always
+    ports:
+      - 8088:80
